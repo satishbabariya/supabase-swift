@@ -176,7 +176,7 @@ final class MessageStore {
 
   /// Fetch all messages and their authors.
   private func fetchMessages(_ channelId: Channel.ID) async throws -> [Message] {
-    try await supabase.database
+    try await supabase
       .from("messages")
       .select("*,user:user_id(*),channel:channel_id(*)")
       .eq("channel_id", value: channelId)

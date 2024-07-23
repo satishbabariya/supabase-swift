@@ -26,13 +26,61 @@ struct AddChannel: Encodable {
   var createdBy: UUID
 }
 
-struct Channel: Identifiable, Codable, Hashable {
+struct Channel: Identifiable, Hashable, PostgrestModel {
   var id: Int
   var slug: String
   var insertedAt: Date
+
+  struct Insert: PostgrestType, PostgrestEncodable {
+    var id: Int?
+    var slug: String
+    var createdBy: UUID
+    var insertedAt: Date?
+
+    var propertiesMetadata: [AnyPropertyMetadata] {
+      [
+        id == nil ? nil : AnyPropertyMetadata(codingKey: CodingKeys.id, keyPath: \Insert.id),
+        AnyPropertyMetadata(codingKey: CodingKeys.slug, keyPath: \Self.slug),
+        AnyPropertyMetadata(codingKey: CodingKeys.createdBy, keyPath: \Self.createdBy),
+        insertedAt == nil ? nil : AnyPropertyMetadata(codingKey: CodingKeys.insertedAt, keyPath: \Self.insertedAt),
+      ].compactMap { $0 }
+    }
+  }
+
+  struct Update: PostgrestType, PostgrestEncodable {
+    var id: Int?
+    var slug: String?
+    var insertedAt: Date?
+
+    var propertiesMetadata: [AnyPropertyMetadata] {
+      [
+        id == nil ? nil : AnyPropertyMetadata(codingKey: CodingKeys.id, keyPath: \Insert.id),
+        slug == nil ? nil : AnyPropertyMetadata(codingKey: CodingKeys.slug, keyPath: \Self.slug),
+        insertedAt == nil ? nil : AnyPropertyMetadata(codingKey: CodingKeys.insertedAt, keyPath: \Self.insertedAt),
+      ].compactMap { $0 }
+    }
+  }
+
+  enum Metadata: SchemaMetadata {
+    static let tableName: String = "channels"
+
+    struct Attributes {
+      let id = AnyPropertyMetadata(codingKey: CodingKeys.id, keyPath: \Channel.id)
+      let slug = AnyPropertyMetadata(codingKey: CodingKeys.slug, keyPath: \Channel.slug)
+      let insertedAt = AnyPropertyMetadata(codingKey: CodingKeys.insertedAt, keyPath: \Channel.insertedAt)
+    }
+    static let attributes = Attributes()
+
+    struct TypedAttributes {
+      let id = PropertyMetadata(codingKey: CodingKeys.id, keyPath: \Channel.id)
+      let slug = PropertyMetadata(codingKey: CodingKeys.slug, keyPath: \Channel.slug)
+      let insertedAt = PropertyMetadata(codingKey: CodingKeys.insertedAt, keyPath: \Channel.insertedAt)
+    }
+    static let typedAttributes = TypedAttributes()
+  }
 }
 
-struct Message: Identifiable, Codable, Hashable {
+struct Message: Identifiable, Decodable, Hashable {
   var id: Int
   var insertedAt: Date
   var message: String

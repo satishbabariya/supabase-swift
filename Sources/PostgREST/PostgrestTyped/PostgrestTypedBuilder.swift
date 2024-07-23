@@ -24,11 +24,11 @@ public class PostgrestTypedBuilder<Model: PostgrestModel, Response: Sendable>: @
     http = HTTPClient(fetch: configuration.fetch, interceptors: [])
   }
 
-  func execute() async throws where Response == Void {
+  public func execute() async throws where Response == Void {
     try await execute { _ in }
   }
 
-  func execute() async throws -> Response where Response: PostgrestDecodable {
+  public func execute() async throws -> Response where Response: PostgrestDecodable {
     try await execute {
       try $0.decoded(as: Response.self, decoder: Response.decoder)
     }

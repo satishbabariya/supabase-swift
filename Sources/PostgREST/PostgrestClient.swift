@@ -124,11 +124,11 @@ public final class PostgrestClient: Sendable {
     )
   }
 
-  public func from<Model: PostgrestModel>(_ model: Model.Type) -> PostgrestTypedQueryBuilder<Model> {
+  public func from<Model: PostgrestModel>(_ model: Model.Type = Model.self) -> PostgrestTypedQueryBuilder<Model> {
     PostgrestTypedQueryBuilder(
       configuration: configuration,
       request: HTTPRequest(
-        url: configuration.url.appendingPathExtension(model.Metadata.tableName),
+        url: configuration.url.appendingPathExtension(Model.Metadata.tableName),
         method: .get
       )
     )

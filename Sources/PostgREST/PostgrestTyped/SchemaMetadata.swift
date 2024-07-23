@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct AnyPropertyMetadata {
+public struct AnyPropertyMetadata: @unchecked Sendable /* AnyKeyPath */ {
   let name: String
   let keyPath: AnyKeyPath
 }
@@ -18,7 +18,7 @@ extension AnyPropertyMetadata {
   }
 }
 
-public struct PropertyMetadata<Model, Value> {
+public struct PropertyMetadata<Model, Value>: @unchecked Sendable /* AnyKeyPath */ {
   let name: String
   let keyPath: KeyPath<Model, Value>
 }

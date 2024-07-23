@@ -7,7 +7,7 @@
 
 import Foundation
 
-public protocol PostgrestModel: Decodable, Sendable {
+public protocol PostgrestModel: PostgrestDecodable, Sendable {
   associatedtype Insert: PostgrestType & PostgrestEncodable
   associatedtype Update: PostgrestType & PostgrestEncodable
   associatedtype Metadata: SchemaMetadata

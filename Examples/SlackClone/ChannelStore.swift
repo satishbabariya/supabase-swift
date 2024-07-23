@@ -46,9 +46,9 @@ final class ChannelStore {
   func addChannel(_ name: String) async {
     do {
       let userId = try await supabase.auth.session.user.id
-      let channel = AddChannel(slug: name, createdBy: userId)
-      try await supabase.database
-        .from("channels")
+      let channel = Channel.Insert(slug: name, createdBy: userId)
+      try await supabase
+        .from(Channel.self)
         .insert(channel)
         .execute()
     } catch {
@@ -62,12 +62,13 @@ final class ChannelStore {
       return channel
     }
 
-    let channel: Channel = try await supabase.database
-      .from("channels")
-      .select()
-      .eq("id", value: id)
+    let channel = try await supabase
+      .from(Channel.self)
+      .select(\.id)
+      .eq(\.id, id)
+      .single()
       .execute()
-      .value
+
     channels.append(channel)
     return channel
   }
@@ -90,7 +91,10 @@ final class ChannelStore {
 
   private func fetchChannels() async -> [Channel] {
     do {
-      return try await supabase.database.from("channels").select().execute().value
+      return try await supabase
+        .from(Channel.self)
+        .select()
+        .execute()
     } catch {
       dump(error)
       toast = .init(status: .error, title: "Error", description: error.localizedDescription)

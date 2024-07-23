@@ -28,3 +28,7 @@ extension PostgrestDecodable {
 }
 
 public typealias PostgrestCodable = PostgrestDecodable & PostgrestEncodable
+
+extension Array: PostgrestDecodable where Element: PostgrestDecodable {
+  public static var decoder: JSONDecoder { Element.decoder }
+}

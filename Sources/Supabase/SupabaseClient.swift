@@ -212,6 +212,11 @@ public final class SupabaseClient: Sendable {
     rest.from(table)
   }
 
+  /// Performs a query on a table or a view.
+  public func from<Model: PostgrestModel>(_ model: Model.Type = Model.self) -> PostgrestTypedQueryBuilder<Model> {
+    rest.from(model)
+  }
+
   /// Performs a function call.
   /// - Parameters:
   ///   - fn: The function name to call.
