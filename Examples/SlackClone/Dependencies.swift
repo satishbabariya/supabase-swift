@@ -69,6 +69,7 @@ struct Channel: Identifiable, Hashable, PostgrestModel {
       let slug = AnyPropertyMetadata(codingKey: CodingKeys.slug, keyPath: \Channel.slug)
       let insertedAt = AnyPropertyMetadata(codingKey: CodingKeys.insertedAt, keyPath: \Channel.insertedAt)
     }
+
     static let attributes = Attributes()
 
     struct TypedAttributes {
@@ -76,6 +77,7 @@ struct Channel: Identifiable, Hashable, PostgrestModel {
       let slug = PropertyMetadata(codingKey: CodingKeys.slug, keyPath: \Channel.slug)
       let insertedAt = PropertyMetadata(codingKey: CodingKeys.insertedAt, keyPath: \Channel.insertedAt)
     }
+
     static let typedAttributes = TypedAttributes()
   }
 }

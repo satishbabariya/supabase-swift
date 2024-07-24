@@ -100,6 +100,7 @@ let package = Package(
       name: "PostgREST",
       dependencies: [
         .product(name: "ConcurrencyExtras", package: "swift-concurrency-extras"),
+        .product(name: "IssueReporting", package: "swift-issue-reporting"),
         "Helpers",
       ]
     ),
@@ -168,7 +169,7 @@ let package = Package(
       name: "PostgRESTMacros",
       dependencies: [
         "PostgRESTMacrosPlugin",
-        .product(name: "XCTestDynamicOverlay", package: "xctest-dynamic-overlay"),
+        .product(name: "IssueReporting", package: "swift-issue-reporting"),
       ]
     ),
     .macro(

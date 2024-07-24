@@ -8,6 +8,7 @@
 import ConcurrencyExtras
 import Foundation
 import Helpers
+import IssueReporting
 
 let version = Helpers.version
 
@@ -41,6 +42,11 @@ extension PostgrestClient.Configuration {
   public static let jsonEncoder = { () -> JSONEncoder in
     let encoder = JSONEncoder()
     encoder.dateEncodingStrategy = .iso8601
+
+    if isTesting {
+      encoder.outputFormatting.insert(.sortedKeys)
+    }
+
     return encoder
   }()
 

@@ -124,7 +124,7 @@ public final class PostgrestClient: Sendable {
     )
   }
 
-  public func from<Model: PostgrestModel>(_ model: Model.Type = Model.self) -> PostgrestTypedQueryBuilder<Model> {
+  public func from<Model: PostgrestModel>(_: Model.Type = Model.self) -> PostgrestTypedQueryBuilder<Model> {
     PostgrestTypedQueryBuilder(
       configuration: configuration,
       request: HTTPRequest(

@@ -68,13 +68,3 @@ package enum HTTPMethod: String, Sendable {
   case patch = "PATCH"
   case options = "OPTIONS"
 }
-
-extension [URLQueryItem] {
-  package mutating func appendOrUpdate(_ queryItem: URLQueryItem) {
-    if let index = firstIndex(where: { $0.name == queryItem.name }) {
-      self[index] = queryItem
-    } else {
-      self.append(queryItem)
-    }
-  }
-}

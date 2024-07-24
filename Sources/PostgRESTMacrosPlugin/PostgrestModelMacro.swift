@@ -24,7 +24,7 @@ public enum PostgrestModelMacro {
 
 extension PostgrestModelMacro: ExtensionMacro {
   public static func expansion(
-    of node: SwiftSyntax.AttributeSyntax,
+    of _: SwiftSyntax.AttributeSyntax,
     attachedTo declaration: some SwiftSyntax.DeclGroupSyntax,
     providingExtensionsOf type: some SwiftSyntax.TypeSyntaxProtocol,
     conformingTo _: [SwiftSyntax.TypeSyntax],

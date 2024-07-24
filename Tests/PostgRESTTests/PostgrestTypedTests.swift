@@ -13,7 +13,7 @@ class PostgrestTypedTests: XCTestCase {
   let client = PostgrestClient(url: URL(string: "http://localhost:54321/rest")!, logger: nil)
 
   func testSelect() {
-    var query = client.from(Book.self).select(\.id, \.name)
+    var query = client.from(Book.self).select(\.id, \.name, as: Book.self)
     XCTAssertEqual(query.request.method, .get)
     XCTAssertEqual(
       query.request.query,
@@ -29,6 +29,34 @@ class PostgrestTypedTests: XCTestCase {
         URLQueryItem(name: "select", value: "*"),
       ]
     )
+  }
+
+  func testFilterEq() {
+    let id = UUID()
+
+    let query = client.from(Book.self)
+      .select(\.id, \.name, as: Book.self)
+      .eq(\.id, id)
+
+    XCTAssertEqual(query.request.query.last, URLQueryItem(name: "id", value: "eq.\(id)"))
+  }
+
+  func testFilterNot() {
+    let id = UUID()
+
+    let query = client.from(Book.self)
+      .select(\.id, \.name, as: Book.self)
+      .not(\.id, "eq", id)
+
+    XCTAssertEqual(query.request.query.last, URLQueryItem(name: "id", value: "not.eq.\(id)"))
+  }
+
+  func testFilterLikeAllOf() {
+    let query = client.from(Book.self)
+      .select(\.id, \.name, as: Book.self)
+      .likeAllOf(\.name, ["a", "b", "c"])
+
+    XCTAssertEqual(query.request.query.last, URLQueryItem(name: "name", value: "like(all).{a,b,c}"))
   }
 
   func testInsert() throws {
@@ -114,15 +142,15 @@ extension Author: PostgrestModel {
     }
 
     struct Attributes {
-      let id = AnyPropertyMetadata(codingKey: CodingKeys.id, keyPath: \Author.id)
-      let name = AnyPropertyMetadata(codingKey: CodingKeys.name, keyPath: \Author.name)
+      let id = _AnyPropertyMetadata(codingKey: CodingKeys.id, keyPath: \Author.id)
+      let name = _AnyPropertyMetadata(codingKey: CodingKeys.name, keyPath: \Author.name)
     }
 
     static var attributes = Attributes()
 
     struct TypedAttributes {
-      let id = PropertyMetadata(codingKey: CodingKeys.id, keyPath: \Author.id)
-      let name = PropertyMetadata(codingKey: CodingKeys.name, keyPath: \Author.name)
+      let id = _PropertyMetadata(codingKey: CodingKeys.id, keyPath: \Author.id)
+      let name = _PropertyMetadata(codingKey: CodingKeys.name, keyPath: \Author.name)
     }
 
     static var typedAttributes = TypedAttributes()
@@ -138,14 +166,14 @@ extension Author: PostgrestModel {
     var id: UUID?
     var name: String
 
-    var propertiesMetadata: [AnyPropertyMetadata] {
-      var attributes = [AnyPropertyMetadata]()
+    var _propertiesMetadata: [_AnyPropertyMetadata] {
+      var attributes = [_AnyPropertyMetadata]()
 
       if id != nil {
-        attributes.append(AnyPropertyMetadata(codingKey: CodingKeys.id, keyPath: \Insert.id))
+        attributes.append(_AnyPropertyMetadata(codingKey: CodingKeys.id, keyPath: \Insert.id))
       }
 
-      attributes.append(AnyPropertyMetadata(codingKey: CodingKeys.name, keyPath: \Insert.name))
+      attributes.append(_AnyPropertyMetadata(codingKey: CodingKeys.name, keyPath: \Insert.name))
 
       return attributes
     }
@@ -155,15 +183,15 @@ extension Author: PostgrestModel {
     var id: UUID?
     var name: String?
 
-    var propertiesMetadata: [AnyPropertyMetadata] {
-      var attributes = [AnyPropertyMetadata]()
+    var _propertiesMetadata: [_AnyPropertyMetadata] {
+      var attributes = [_AnyPropertyMetadata]()
 
       if id != nil {
-        attributes.append(AnyPropertyMetadata(codingKey: CodingKeys.id, keyPath: \Update.id))
+        attributes.append(_AnyPropertyMetadata(codingKey: CodingKeys.id, keyPath: \Update.id))
       }
 
       if name != nil {
-        attributes.append(AnyPropertyMetadata(codingKey: CodingKeys.name, keyPath: \Update.name))
+        attributes.append(_AnyPropertyMetadata(codingKey: CodingKeys.name, keyPath: \Update.name))
       }
 
       return attributes
@@ -178,15 +206,15 @@ extension Book: PostgrestModel {
     }
 
     struct Attributes {
-      let id = AnyPropertyMetadata(codingKey: CodingKeys.id, keyPath: \Book.id)
-      let name = AnyPropertyMetadata(codingKey: CodingKeys.name, keyPath: \Book.name)
-      let authorId = AnyPropertyMetadata(codingKey: CodingKeys.authorId, keyPath: \Book.authorId)
+      let id = _AnyPropertyMetadata(codingKey: CodingKeys.id, keyPath: \Book.id)
+      let name = _AnyPropertyMetadata(codingKey: CodingKeys.name, keyPath: \Book.name)
+      let authorId = _AnyPropertyMetadata(codingKey: CodingKeys.authorId, keyPath: \Book.authorId)
     }
 
     struct TypedAttributes {
-      let id = PropertyMetadata(codingKey: CodingKeys.id, keyPath: \Book.id)
-      let name = PropertyMetadata(codingKey: CodingKeys.name, keyPath: \Book.name)
-      let authorId = PropertyMetadata(codingKey: CodingKeys.authorId, keyPath: \Book.authorId)
+      let id = _PropertyMetadata(codingKey: CodingKeys.id, keyPath: \Book.id)
+      let name = _PropertyMetadata(codingKey: CodingKeys.name, keyPath: \Book.name)
+      let authorId = _PropertyMetadata(codingKey: CodingKeys.authorId, keyPath: \Book.authorId)
     }
 
     static let attributes = Attributes()
@@ -211,15 +239,15 @@ extension Book: PostgrestModel {
       case authorId = "author_id"
     }
 
-    var propertiesMetadata: [AnyPropertyMetadata] {
-      var attributes = [AnyPropertyMetadata]()
+    var _propertiesMetadata: [_AnyPropertyMetadata] {
+      var attributes = [_AnyPropertyMetadata]()
 
       if id != nil {
-        attributes.append(AnyPropertyMetadata(codingKey: CodingKeys.id, keyPath: \Insert.id))
+        attributes.append(_AnyPropertyMetadata(codingKey: CodingKeys.id, keyPath: \Insert.id))
       }
 
-      attributes.append(AnyPropertyMetadata(codingKey: CodingKeys.name, keyPath: \Insert.name))
-      attributes.append(AnyPropertyMetadata(codingKey: CodingKeys.authorId, keyPath: \Insert.authorId))
+      attributes.append(_AnyPropertyMetadata(codingKey: CodingKeys.name, keyPath: \Insert.name))
+      attributes.append(_AnyPropertyMetadata(codingKey: CodingKeys.authorId, keyPath: \Insert.authorId))
 
       return attributes
     }
@@ -236,19 +264,19 @@ extension Book: PostgrestModel {
       case authorId = "author_id"
     }
 
-    var propertiesMetadata: [AnyPropertyMetadata] {
-      var attributes = [AnyPropertyMetadata]()
+    var _propertiesMetadata: [_AnyPropertyMetadata] {
+      var attributes = [_AnyPropertyMetadata]()
 
       if id != nil {
-        attributes.append(AnyPropertyMetadata(codingKey: CodingKeys.id, keyPath: \Update.id))
+        attributes.append(_AnyPropertyMetadata(codingKey: CodingKeys.id, keyPath: \Update.id))
       }
 
       if name != nil {
-        attributes.append(AnyPropertyMetadata(codingKey: CodingKeys.name, keyPath: \Update.name))
+        attributes.append(_AnyPropertyMetadata(codingKey: CodingKeys.name, keyPath: \Update.name))
       }
 
       if authorId != nil {
-        attributes.append(AnyPropertyMetadata(codingKey: CodingKeys.authorId, keyPath: \Update.authorId))
+        attributes.append(_AnyPropertyMetadata(codingKey: CodingKeys.authorId, keyPath: \Update.authorId))
       }
 
       return attributes

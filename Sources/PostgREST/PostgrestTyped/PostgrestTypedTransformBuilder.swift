@@ -7,17 +7,68 @@
 
 import Foundation
 
-public class PostgrestTypedTransformBuilder<Model: PostgrestModel, Response: Sendable>: PostgrestTypedBuilder<Model, Response> {
+/*
+ let countries = try await client.from(Country.self)
+  .select(
+    .name,
+    .cities(.name)
+  )
+  .execute()
+
+ let messages = try await client
+  .from(Message.self)
+  .select(
+    .content,
+    .from(.name),
+    .to(.name)
+  )
+  .execute()
+
+struct Country {
+ let name: String
+
+ @Relationship
+ let cities: [City]
+}
+
+ struct PartialCountry {
+  let name: String
+
+  @Relationship
+  let cities: [City]
+
+  struct Columns {
+    let name = ColumnDefinition("name")
+    let countries = ColumnDefinition("cities")
+
+    func countries(_ first: City.Columns, _ rest: City.Columns...) -> ColumnDefinition {
+      ColumnDefinition("cities(\(([first] + rest).joined(separator: ","))")
+    }
+ }
+
+ let cities = try await client
+  .from(Country.self)
+  .select()
+  .eq(.countries(.name), "Estonia")
+  .execute()
+ */
+
+public class PostgrestTypedTransformBuilder<Model: PostgrestModel, Response: Sendable>: PostgrestTypedBuilder<Model, Response>, @unchecked Sendable {
   public func select(
-    _ attributes: KeyPath<Model.Metadata.Attributes, AnyPropertyMetadata>...
+    _ first: KeyPath<Model.Metadata.Attributes, _AnyPropertyMetadata>,
+    _ rest: KeyPath<Model.Metadata.Attributes, _AnyPropertyMetadata>...
   ) -> PostgrestTypedTransformBuilder<Model, [Model]> {
-    select(attributes)
+    select([first] + rest)
   }
 
   public func select(
-    _ attributes: [KeyPath<Model.Metadata.Attributes, AnyPropertyMetadata>] = []
+    _ attributes: [KeyPath<Model.Metadata.Attributes, _AnyPropertyMetadata>]
   ) -> PostgrestTypedTransformBuilder<Model, [Model]> {
-    let columns = attributes.map { Model.Metadata.attributes[keyPath: $0].name }.joined(separator: ",")
+    let columns: String = if attributes.isEmpty {
+      "*"
+    } else {
+      attributes.map { Model.Metadata.attributes[keyPath: $0].name }.joined(separator: ",")
+    }
 
     return request.withValue {
       $0.query.appendOrUpdate(URLQueryItem(name: "select", value: columns))
@@ -32,7 +83,7 @@ public class PostgrestTypedTransformBuilder<Model: PostgrestModel, Response: Sen
   }
 
   public func order(
-    _ column: KeyPath<Model.Metadata.Attributes, AnyPropertyMetadata>,
+    _ column: KeyPath<Model.Metadata.Attributes, _AnyPropertyMetadata>,
     ascending: Bool = true,
     nullsFirst: Bool = false,
     referencedTable: String? = nil

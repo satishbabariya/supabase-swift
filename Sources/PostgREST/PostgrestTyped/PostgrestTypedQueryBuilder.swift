@@ -7,16 +7,23 @@
 
 import Foundation
 
-public class PostgrestTypedQueryBuilder<Model: PostgrestModel>: PostgrestTypedBuilder<Model, Void> {
-  public func select(
-    _ columns: KeyPath<Model.Metadata.Attributes, AnyPropertyMetadata>...
-  ) -> PostgrestTypedFilterBuilder<Model, [Model]> {
-    select(columns)
+public class PostgrestTypedQueryBuilder<Model: PostgrestModel>: PostgrestTypedBuilder<Model, Void>, @unchecked Sendable {
+  public func select() -> PostgrestTypedFilterBuilder<Model, [Model]> {
+    select([], as: Model.self)
   }
 
-  public func select(
-    _ attributes: [KeyPath<Model.Metadata.Attributes, AnyPropertyMetadata>] = []
-  ) -> PostgrestTypedFilterBuilder<Model, [Model]> {
+  public func select<Response>(
+    _ first: KeyPath<Model.Metadata.Attributes, _AnyPropertyMetadata>,
+    _ rest: KeyPath<Model.Metadata.Attributes, _AnyPropertyMetadata>...,
+    as: Response.Type
+  ) -> PostgrestTypedFilterBuilder<Model, [Response]> {
+    select([first] + rest, as: Response.self)
+  }
+
+  public func select<Response>(
+    _ attributes: [KeyPath<Model.Metadata.Attributes, _AnyPropertyMetadata>],
+    as _: Response.Type
+  ) -> PostgrestTypedFilterBuilder<Model, [Response]> {
     let columns: String = if attributes.isEmpty {
       "*"
     } else {
@@ -50,7 +57,7 @@ public class PostgrestTypedQueryBuilder<Model: PostgrestModel>: PostgrestTypedBu
 
       var allKeys: Set<String> = []
       for value in values {
-        allKeys.formUnion(value.propertiesMetadata.map(\.name))
+        allKeys.formUnion(value._propertiesMetadata.map(\.name))
       }
       let allColumns = allKeys.sorted().joined(separator: ",")
       $0.query.appendOrUpdate(URLQueryItem(name: "columns", value: allColumns))

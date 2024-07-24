@@ -21,13 +21,19 @@ public class PostgrestTypedBuilder<Model: PostgrestModel, Response: Sendable>: @
     self.configuration = configuration
     self.request = LockIsolated(request)
 
-    http = HTTPClient(fetch: configuration.fetch, interceptors: [])
+    var interceptors: [any HTTPClientInterceptor] = []
+    if let logger = configuration.logger {
+      interceptors.append(LoggerInterceptor(logger: logger))
+    }
+
+    http = HTTPClient(fetch: configuration.fetch, interceptors: interceptors)
   }
 
   public func execute() async throws where Response == Void {
     try await execute { _ in }
   }
 
+  @discardableResult
   public func execute() async throws -> Response where Response: PostgrestDecodable {
     try await execute {
       try $0.decoded(as: Response.self, decoder: Response.decoder)
