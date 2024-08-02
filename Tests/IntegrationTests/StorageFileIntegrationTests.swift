@@ -329,6 +329,14 @@ final class StorageFileIntegrationTests: XCTestCase {
     }
   }
 
+  @available(iOS 17.0, macOS 14.0, *)
+  func testResumableUpload() async throws {
+    let uploadData = createTestBuffer(sizeInMB: 5)
+
+    let task = storage.from(bucketName).resumableUpload(path: "resumable-upload-file", file: uploadData)
+    await task.startOrResume()
+  }
+
   private func newBucket(
     prefix: String = "",
     options: BucketOptions = BucketOptions(public: true)
@@ -357,4 +365,16 @@ final class StorageFileIntegrationTests: XCTestCase {
       .appendingPathComponent("Fixtures/Upload")
       .appendingPathComponent(fileName)
   }
+}
+
+func createTestBuffer(sizeInMB: Int) -> Data {
+    let bufferSize = sizeInMB * 1024 * 1024 // Convert MB to bytes
+    var buffer = Data(count: bufferSize)
+    buffer.withUnsafeMutableBytes { rawBufferPointer in
+        let pointer = rawBufferPointer.bindMemory(to: UInt8.self)
+        let bufferPointer = UnsafeMutableBufferPointer(start: pointer.baseAddress, count: bufferSize)
+        let repeatingPattern: UInt8 = 0xFF // You can change the pattern if desired
+        bufferPointer.initialize(repeating: repeatingPattern)
+    }
+    return buffer
 }
