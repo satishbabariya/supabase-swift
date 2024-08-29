@@ -7,20 +7,23 @@
 
 import SwiftUI
 
-struct UIViewControllerWrapper<T: UIViewController>: UIViewControllerRepresentable {
-  typealias UIViewControllerType = T
+#if canImport(UIKit)
 
-  let viewController: T
+  struct UIViewControllerWrapper<T: UIViewController>: UIViewControllerRepresentable {
+    typealias UIViewControllerType = T
 
-  init(_ viewController: T) {
-    self.viewController = viewController
+    let viewController: T
+
+    init(_ viewController: T) {
+      self.viewController = viewController
+    }
+
+    func makeUIViewController(context _: Context) -> T {
+      viewController
+    }
+
+    func updateUIViewController(_: T, context _: Context) {
+      // Update the view controller if needed
+    }
   }
-
-  func makeUIViewController(context _: Context) -> T {
-    viewController
-  }
-
-  func updateUIViewController(_: T, context _: Context) {
-    // Update the view controller if needed
-  }
-}
+#endif

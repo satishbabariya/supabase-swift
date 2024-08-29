@@ -709,7 +709,6 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Examples/Examples.entitlements;
-				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"Examples/Preview Content\"";
 				DEVELOPMENT_TEAM = ELTTE7K8TT;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -719,7 +718,12 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.supabase.swift-examples";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = NO;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -729,7 +733,6 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Examples/Examples.entitlements;
-				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"Examples/Preview Content\"";
 				DEVELOPMENT_TEAM = ELTTE7K8TT;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -739,7 +742,12 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.supabase.swift-examples";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = NO;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};

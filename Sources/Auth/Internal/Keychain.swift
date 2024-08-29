@@ -67,10 +67,12 @@
         query[kSecAttrAccessGroup as String] = accessGroup
       }
 
-      // this is highly recommended for all keychain operations and makes the
-      // macOS keychain item behave like an iOS keychain item
-      // https://developer.apple.com/documentation/security/ksecusedataprotectionkeychain
-      query[kSecUseDataProtectionKeychain as String] = kCFBooleanTrue
+      #if os(macOS)
+        // this is highly recommended for all keychain operations and makes the
+        // macOS keychain item behave like an iOS keychain item
+        // https://developer.apple.com/documentation/security/ksecusedataprotectionkeychain
+        query[kSecUseDataProtectionKeychain as String] = kCFBooleanTrue
+      #endif
 
       return query
     }
@@ -85,7 +87,14 @@
     func setQuery(forKey key: String, data: Data) -> [String: Any] {
       var query = baseQuery(withKey: key, data: data)
 
-      query[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlock
+      #if os(macOS)
+        // See https://developer.apple.com/documentation/security/ksecattraccessible
+        if query[kSecUseDataProtectionKeychain as String] as? Bool == true {
+          query[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlock
+        }
+      #else
+        query[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlock
+      #endif
 
       return query
     }
@@ -102,6 +111,7 @@
       case itemNotFound
       case interactionNotAllowed
       case decodeFailed
+      case missingEntitlement
       case other(status: OSStatus)
       case unknown(message: String)
 
@@ -116,6 +126,7 @@
         case errSecItemNotFound: self = .itemNotFound
         case errSecInteractionNotAllowed: self = .interactionNotAllowed
         case errSecDecode: self = .decodeFailed
+        case errSecMissingEntitlement: self = .missingEntitlement
         default: self = .other(status: rawValue)
         }
       }
@@ -131,6 +142,7 @@
         case .itemNotFound: errSecItemNotFound
         case .interactionNotAllowed: errSecInteractionNotAllowed
         case .decodeFailed: errSecDecode
+        case .missingEntitlement: errSecMissingEntitlement
         case let .other(status): status
         case .unknown: errSecSuccess // This is not a Keychain error
         }
@@ -171,6 +183,8 @@
         "errSecInteractionNotAllowed: Interaction with the Security Server is not allowed."
       case .decodeFailed:
         "errSecDecode: Unable to decode the provided data."
+      case .missingEntitlement:
+        "errSecMissingEntitlement: A required entitlement is missing."
       case .other:
         "Unspecified Keychain error: \(status)."
       case let .unknown(message):
@@ -215,6 +229,10 @@
     /// Unable to decode the provided data.
     /// See [errSecDecode](https://developer.apple.com/documentation/security/errsecdecode).
     static let decodeFailed: KeychainError = .init(code: .decodeFailed)
+
+    /// A required entitlement is missing.
+    /// See [errSecMissingEntitlement](https://developer.apple.com/documentation/security/errsecmissingentitlement)
+    static let missingEntitlement: KeychainError = .init(code: .missingEntitlement)
 
     /// Other Keychain error.
     /// The `OSStatus` of the Keychain operation can be accessed via the ``status`` property.

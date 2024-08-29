@@ -93,7 +93,7 @@ extension AuthClient {
   ///   - decoder: The JSON decoder to use for decoding responses.
   ///   - fetch: The asynchronous fetch handler for network requests.
   ///   - autoRefreshToken: Set to `true` if you want to automatically refresh the token before expiring.
-  public convenience init(
+  public init(
     url: URL,
     headers: [String: String] = [:],
     flowType: AuthFlowType = AuthClient.Configuration.defaultFlowType,

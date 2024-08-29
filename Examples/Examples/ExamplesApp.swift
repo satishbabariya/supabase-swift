@@ -9,40 +9,60 @@ import GoogleSignIn
 import Supabase
 import SwiftUI
 
-class AppDelegate: UIResponder, UIApplicationDelegate {
-  func application(
-    _: UIApplication,
-    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
-  ) -> Bool {
-    if let url = launchOptions?[.url] as? URL {
+#if canImport(AppKit)
+  class AppDelegate: NSResponder, NSApplicationDelegate {
+    func applicationDidFinishLaunching(_ notification: Notification) {
+      print(notification)
+//    if let url = launchOptions?[.url] as? URL {
+//      supabase.handle(url)
+//    }
+    }
+
+    func application(_: NSApplication, open urls: [URL]) {
+      guard let url = urls.first else { return }
       supabase.handle(url)
     }
-    return true
+  }
+#else
+  class AppDelegate: UIResponder, UIApplicationDelegate {
+    func application(
+      _: UIApplication,
+      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
+    ) -> Bool {
+      if let url = launchOptions?[.url] as? URL {
+        supabase.handle(url)
+      }
+      return true
+    }
+
+    func application(_: UIApplication, open url: URL, options _: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
+      supabase.handle(url)
+      return true
+    }
+
+    func application(_: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options _: UIScene.ConnectionOptions) -> UISceneConfiguration {
+      let configuration = UISceneConfiguration(name: nil, sessionRole: connectingSceneSession.role)
+      configuration.delegateClass = SceneDelegate.self
+      return configuration
+    }
   }
 
-  func application(_: UIApplication, open url: URL, options _: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
-    supabase.handle(url)
-    return true
-  }
+  class SceneDelegate: UIResponder, UISceneDelegate {
+    func scene(_: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+      guard let url = URLContexts.first?.url else { return }
 
-  func application(_: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options _: UIScene.ConnectionOptions) -> UISceneConfiguration {
-    let configuration = UISceneConfiguration(name: nil, sessionRole: connectingSceneSession.role)
-    configuration.delegateClass = SceneDelegate.self
-    return configuration
+      supabase.handle(url)
+    }
   }
-}
-
-class SceneDelegate: UIResponder, UISceneDelegate {
-  func scene(_: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
-    guard let url = URLContexts.first?.url else { return }
-
-    supabase.handle(url)
-  }
-}
+#endif
 
 @main
 struct ExamplesApp: App {
-  @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+  #if canImport(AppKit)
+    @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+  #else
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+  #endif
 
   var body: some Scene {
     WindowGroup {

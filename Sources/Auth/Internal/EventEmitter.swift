@@ -3,7 +3,10 @@ import Foundation
 import Helpers
 
 struct AuthStateChangeEventEmitter {
-  var emitter = EventEmitter<(AuthChangeEvent, Session?)?>(initialEvent: nil, emitsLastEventWhenAttaching: false)
+  let emitter = EventEmitter<(AuthChangeEvent, Session?)?>(
+    initialEvent: nil,
+    emitsLastEventWhenAttaching: false
+  )
 
   func attach(_ listener: @escaping AuthStateChangeListener) -> ObservationToken {
     emitter.attach { event in

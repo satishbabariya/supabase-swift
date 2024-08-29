@@ -12,17 +12,17 @@ import Helpers
 
 typealias AuthClientID = UUID
 
-public final class AuthClient: Sendable {
-  let clientID = AuthClientID()
+public actor AuthClient {
+  nonisolated let clientID = AuthClientID()
 
+  nonisolated var configuration: AuthClient.Configuration { Dependencies[clientID].configuration }
+  private nonisolated var codeVerifierStorage: CodeVerifierStorage { Dependencies[clientID].codeVerifierStorage }
+  private nonisolated var sessionStorage: SessionStorage { Dependencies[clientID].sessionStorage }
   private var api: APIClient { Dependencies[clientID].api }
-  var configuration: AuthClient.Configuration { Dependencies[clientID].configuration }
-  private var codeVerifierStorage: CodeVerifierStorage { Dependencies[clientID].codeVerifierStorage }
   private var date: @Sendable () -> Date { Dependencies[clientID].date }
-  private var sessionManager: SessionManager { Dependencies[clientID].sessionManager }
   private var eventEmitter: AuthStateChangeEventEmitter { Dependencies[clientID].eventEmitter }
-  private var logger: (any SupabaseLogger)? { Dependencies[clientID].configuration.logger }
-  private var sessionStorage: SessionStorage { Dependencies[clientID].sessionStorage }
+  private nonisolated var logger: (any SupabaseLogger)? { Dependencies[clientID].configuration.logger }
+  private var sessionManager: SessionManager { Dependencies[clientID].sessionManager }
 
   /// Returns the session, refreshing it if necessary.
   ///
@@ -36,26 +36,26 @@ public final class AuthClient: Sendable {
   /// Returns the current session, if any.
   ///
   /// The session returned by this property may be expired. Use ``session`` for a session that is guaranteed to be valid.
-  public var currentSession: Session? {
+  public nonisolated var currentSession: Session? {
     try? sessionStorage.get()
   }
 
   /// Returns the current user, if any.
   ///
   /// The user returned by this property may be outdated. Use ``user(jwt:)`` method to get an up-to-date user instance.
-  public var currentUser: User? {
+  public nonisolated var currentUser: User? {
     try? sessionStorage.get()?.user
   }
 
   /// Namespace for accessing multi-factor authentication API.
-  public var mfa: AuthMFA {
+  public nonisolated var mfa: AuthMFA {
     AuthMFA(clientID: clientID)
   }
 
   /// Namespace for the GoTrue admin methods.
   /// - Warning: This methods requires `service_role` key, be careful to never expose `service_role`
   /// key in the client.
-  public var admin: AuthAdmin {
+  public nonisolated var admin: AuthAdmin {
     AuthAdmin(clientID: clientID)
   }
 
@@ -93,7 +93,7 @@ public final class AuthClient: Sendable {
   /// Listen for auth state changes.
   ///
   /// An `.initialSession` is always emitted when this method is called.
-  public var authStateChanges: AsyncStream<(
+  public nonisolated var authStateChanges: AsyncStream<(
     event: AuthChangeEvent,
     session: Session?
   )> {
@@ -487,7 +487,7 @@ public final class AuthClient: Sendable {
   /// If that isn't the case, you should consider using
   /// ``signInWithOAuth(provider:redirectTo:scopes:queryParams:launchFlow:)`` or
   /// ``signInWithOAuth(provider:redirectTo:scopes:queryParams:configure:)``.
-  public func getOAuthSignInURL(
+  public nonisolated func getOAuthSignInURL(
     provider: Provider,
     scopes: String? = nil,
     redirectTo: URL? = nil,
@@ -657,7 +657,7 @@ public final class AuthClient: Sendable {
   ///     supabase.auth.handle(url)
   ///   }
   /// ```
-  public func handle(_ url: URL) {
+  public nonisolated func handle(_ url: URL) {
     Task {
       do {
         try await session(from: url)
@@ -1174,7 +1174,7 @@ public final class AuthClient: Sendable {
     eventEmitter.emit(.initialSession, session: session, token: token)
   }
 
-  private func prepareForPKCE() -> (codeChallenge: String?, codeChallengeMethod: String?) {
+  private nonisolated func prepareForPKCE() -> (codeChallenge: String?, codeChallengeMethod: String?) {
     guard configuration.flowType == .pkce else {
       return (nil, nil)
     }
@@ -1197,7 +1197,7 @@ public final class AuthClient: Sendable {
     return params["code"] != nil && currentCodeVerifier != nil
   }
 
-  private func getURLForProvider(
+  private nonisolated func getURLForProvider(
     url: URL,
     provider: Provider,
     scopes: String? = nil,
