@@ -43,14 +43,16 @@ public final class SupabaseClient: Sendable {
   var rest: PostgrestClient {
     mutableState.withValue {
       if $0.rest == nil {
-        $0.rest = PostgrestClient(
-          url: databaseURL,
-          schema: options.db.schema,
-          headers: headers,
-          logger: options.global.logger,
-          fetch: fetchWithAuth,
-          encoder: options.db.encoder,
-          decoder: options.db.decoder
+        $0.rest = PostgrestClient.cache(
+          configuration: PostgrestClient.Configuration(
+            url: databaseURL,
+            schema: options.db.schema,
+            headers: headers,
+            logger: options.global.logger,
+            fetch: fetchWithAuth,
+            encoder: options.db.encoder,
+            decoder: options.db.decoder
+          )
         )
       }
 
