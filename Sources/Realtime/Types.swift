@@ -90,7 +90,6 @@ extension HTTPField.Name {
   static let apiKey = Self("apiKey")!
 }
 
-
 /// Represents the different events that can be sent through
 /// a channel regarding a Channel's lifecycle.
 public enum ChannelEvent {
