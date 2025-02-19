@@ -113,7 +113,7 @@ public class StorageFileApi: StorageApi, @unchecked Sendable {
         headers: headers
       )
     )
-    .decoded(as: UploadResponse.self, decoder: configuration.decoder)
+    .decoded(as: UploadResponse.self, decoder: .storageDecoder)
 
     return FileUploadResponse(
       id: response.Id,
@@ -212,7 +212,7 @@ public class StorageFileApi: StorageApi, @unchecked Sendable {
       HTTPRequest(
         url: configuration.url.appendingPathComponent("object/move"),
         method: .post,
-        body: configuration.encoder.encode(
+        body: JSONEncoder.storageEncoder.encode(
           [
             "bucketId": bucketId,
             "sourceKey": source,
@@ -243,7 +243,7 @@ public class StorageFileApi: StorageApi, @unchecked Sendable {
       HTTPRequest(
         url: configuration.url.appendingPathComponent("object/copy"),
         method: .post,
-        body: configuration.encoder.encode(
+        body: JSONEncoder.storageEncoder.encode(
           [
             "bucketId": bucketId,
             "sourceKey": source,
@@ -253,7 +253,7 @@ public class StorageFileApi: StorageApi, @unchecked Sendable {
         )
       )
     )
-    .decoded(as: UploadResponse.self, decoder: configuration.decoder)
+    .decoded(as: UploadResponse.self, decoder: .storageDecoder)
     .Key
   }
 
@@ -274,7 +274,7 @@ public class StorageFileApi: StorageApi, @unchecked Sendable {
       let transform: TransformOptions?
     }
 
-    let encoder = JSONEncoder.unconfiguredEncoder
+    let encoder = JSONEncoder.unconfiguredStorageEncoder
 
     let response = try await execute(
       HTTPRequest(
@@ -285,7 +285,7 @@ public class StorageFileApi: StorageApi, @unchecked Sendable {
         )
       )
     )
-    .decoded(as: SignedURLResponse.self, decoder: configuration.decoder)
+    .decoded(as: SignedURLResponse.self, decoder: .storageDecoder)
 
     return try makeSignedURL(response.signedURL, download: download)
   }
@@ -325,7 +325,7 @@ public class StorageFileApi: StorageApi, @unchecked Sendable {
       let paths: [String]
     }
 
-    let encoder = JSONEncoder.unconfiguredEncoder
+    let encoder = JSONEncoder.unconfiguredStorageEncoder
 
     let response = try await execute(
       HTTPRequest(
@@ -336,7 +336,7 @@ public class StorageFileApi: StorageApi, @unchecked Sendable {
         )
       )
     )
-    .decoded(as: [SignedURLResponse].self, decoder: configuration.decoder)
+    .decoded(as: [SignedURLResponse].self, decoder: .storageDecoder)
 
     return try response.map { try makeSignedURL($0.signedURL, download: download) }
   }
@@ -389,10 +389,10 @@ public class StorageFileApi: StorageApi, @unchecked Sendable {
       HTTPRequest(
         url: configuration.url.appendingPathComponent("object/\(bucketId)"),
         method: .delete,
-        body: configuration.encoder.encode(["prefixes": paths])
+        body: JSONEncoder.storageEncoder.encode(["prefixes": paths])
       )
     )
-    .decoded(decoder: configuration.decoder)
+    .decoded(decoder: .storageDecoder)
   }
 
   /// Lists all the files within a bucket.
@@ -403,7 +403,7 @@ public class StorageFileApi: StorageApi, @unchecked Sendable {
     path: String? = nil,
     options: SearchOptions? = nil
   ) async throws -> [FileObject] {
-    let encoder = JSONEncoder.unconfiguredEncoder
+    let encoder = JSONEncoder.unconfiguredStorageEncoder
 
     var options = options ?? defaultSearchOptions
     options.prefix = path ?? ""
@@ -415,7 +415,7 @@ public class StorageFileApi: StorageApi, @unchecked Sendable {
         body: encoder.encode(options)
       )
     )
-    .decoded(decoder: configuration.decoder)
+    .decoded(decoder: .storageDecoder)
   }
 
   /// Downloads a file from a private bucket. For public buckets, make a request to the URL returned
@@ -453,7 +453,7 @@ public class StorageFileApi: StorageApi, @unchecked Sendable {
         method: .get
       )
     )
-    .decoded(decoder: configuration.decoder)
+    .decoded(decoder: .storageDecoder)
   }
 
   /// Checks the existence of file.
@@ -561,7 +561,7 @@ public class StorageFileApi: StorageApi, @unchecked Sendable {
         headers: headers
       )
     )
-    .decoded(as: Response.self, decoder: configuration.decoder)
+    .decoded(as: Response.self, decoder: .storageDecoder)
 
     let signedURL = try makeSignedURL(response.url, download: nil)
 
@@ -662,7 +662,7 @@ public class StorageFileApi: StorageApi, @unchecked Sendable {
         headers: headers
       )
     )
-    .decoded(as: UploadResponse.self, decoder: configuration.decoder)
+    .decoded(as: UploadResponse.self, decoder: .storageDecoder)
     .Key
 
     return SignedURLUploadResponse(path: path, fullPath: fullPath)

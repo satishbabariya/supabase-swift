@@ -15,7 +15,7 @@ public class StorageBucketApi: StorageApi, @unchecked Sendable {
         method: .get
       )
     )
-    .decoded(decoder: configuration.decoder)
+    .decoded(decoder: .storageDecoder)
   }
 
   /// Retrieves the details of an existing Storage bucket.
@@ -28,7 +28,7 @@ public class StorageBucketApi: StorageApi, @unchecked Sendable {
         method: .get
       )
     )
-    .decoded(decoder: configuration.decoder)
+    .decoded(decoder: .storageDecoder)
   }
 
   struct BucketParameters: Encodable {
@@ -48,7 +48,7 @@ public class StorageBucketApi: StorageApi, @unchecked Sendable {
       HTTPRequest(
         url: configuration.url.appendingPathComponent("bucket"),
         method: .post,
-        body: configuration.encoder.encode(
+        body: JSONEncoder.storageEncoder.encode(
           BucketParameters(
             id: id,
             name: id,
@@ -70,7 +70,7 @@ public class StorageBucketApi: StorageApi, @unchecked Sendable {
       HTTPRequest(
         url: configuration.url.appendingPathComponent("bucket/\(id)"),
         method: .put,
-        body: configuration.encoder.encode(
+        body: JSONEncoder.storageEncoder.encode(
           BucketParameters(
             id: id,
             name: id,
